@@ -14,10 +14,17 @@ interface IdentityVars {
   address: string;
 }
 
+//Please note that this API supports pagination
 export const GET_IDENTITY = gql`
-query GetIdentity($address:String!){
+query GetIdentity($address:String!,
+                  $numberOfFollowers:Int,
+                  $nextCursorFollowers:String,
+                  $numberOfFollowings:Int,
+                  $nextCursorFollowings:String,
+                  $numberOfFriends:Int,
+                  $nextCursorFriends:String){
     identity(address:$address){
-              address,
+      address,
       domain,
       ens,
       social{
@@ -27,7 +34,7 @@ query GetIdentity($address:String!){
       joinTime,
       followerCount,
       followingCount,
-      followers{
+      followers(first:$numberOfFollowers, after:$nextCursorFollowers){
         pageInfo{
           startCursor,
           endCursor,
@@ -44,8 +51,8 @@ query GetIdentity($address:String!){
           lastModifiedTime
         }
       }
-      followings{
-        pageInfo{
+      followings(first:$numberOfFollowings, after:$nextCursorFollowings){
+          pageInfo{
           startCursor,
           endCursor,
           hasNextPage,
@@ -61,8 +68,8 @@ query GetIdentity($address:String!){
           lastModifiedTime
         }
       }
-      friends{
-              pageInfo{
+      friends(first:$numberOfFriends, after:$nextCursorFriends){
+          pageInfo{
           startCursor,
           endCursor,
           hasNextPage,
