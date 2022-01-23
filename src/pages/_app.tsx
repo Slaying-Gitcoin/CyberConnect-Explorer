@@ -2,11 +2,14 @@ import '../../styles/globals.css'
 import type { AppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
 import client from '../graphql/apollo-client'
+import Web3ContextProvider from '../context/Web3Context'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={client}>
-      <Component {...pageProps} />
+      <Web3ContextProvider>
+        <Component {...pageProps} />
+      </Web3ContextProvider>
     </ApolloProvider>
   )
 }
