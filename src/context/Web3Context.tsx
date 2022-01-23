@@ -1,6 +1,6 @@
 // credits: https://github.com/cyberconnecthq/api-demo/blob/main/src/context/web3Context.tsx
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, createContext, useCallback } from 'react';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers } from 'ethers';
@@ -13,7 +13,7 @@ interface Web3ContextInterface {
   ens: string | null;
 }
 
-export const Web3Context = React.createContext<Web3ContextInterface>({
+export const Web3Context = createContext<Web3ContextInterface>({
   connectWallet: async () => undefined,
   disconnectWallet: async () => undefined,
   address: '',
@@ -38,7 +38,7 @@ const providerOptions = {
   }
 };
 
-export const Web3ContextProvider: React.FC = ({ children }) => {
+const Web3ContextProvider: React.FC = ({ children }) => {
   const [address, setAddress] = useState<string>('');
   const [ens, setEns] = useState<string | null>('');
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined);
@@ -77,7 +77,7 @@ export const Web3ContextProvider: React.FC = ({ children }) => {
     [disconnectWallet]
   );
 
-  const connectWallet = React.useCallback(async () => {
+  const connectWallet = useCallback(async () => {
     if (!web3Modal) {
       console.error('web3modal not initialized');
       throw 'web3modal not initialized';
@@ -108,9 +108,12 @@ export const Web3ContextProvider: React.FC = ({ children }) => {
 
     setWeb3Modal(web3Modal);
   }, []);
-  if (web3Modal != null && web3Modal.cachedProvider) {
-    connectWallet();
-  }
+
+  useEffect(() => {
+    if (web3Modal != null && web3Modal.cachedProvider) {
+      connectWallet();
+    }
+  }, [web3Modal]);
 
   return (
     <Web3Context.Provider
@@ -125,3 +128,5 @@ export const Web3ContextProvider: React.FC = ({ children }) => {
     </Web3Context.Provider>
   );
 };
+
+export default Web3ContextProvider;

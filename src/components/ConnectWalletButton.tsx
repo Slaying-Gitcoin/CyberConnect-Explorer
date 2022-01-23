@@ -1,7 +1,7 @@
 import { useCallback, useContext } from 'react';
 import { Web3Context } from '../context/Web3Context';
 
-export const ConnectWalletButton = () => {
+const ConnectWalletButton = () => {
   const { connectWallet, address, ens } = useContext(Web3Context);
 
   const connect = useCallback(async () => {
@@ -20,3 +20,5 @@ export const ConnectWalletButton = () => {
     </>
   );
 };
+
+export default ConnectWalletButton;
