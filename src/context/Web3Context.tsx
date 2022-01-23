@@ -51,12 +51,12 @@ const Web3ContextProvider: React.FC = ({ children }) => {
     return ens;
   }
 
-  const disconnectWallet = React.useCallback(async () => {
+  const disconnectWallet = useCallback(async () => {
     setAddress('');
     setEns('');
   }, []);
 
-  const subsribeProvider = React.useCallback(
+  const subsribeProvider = useCallback(
     // @ts-ignore
     (provider: Web3Provider) => {
       provider.on('accountsChanged', (accounts: string[]) => {
