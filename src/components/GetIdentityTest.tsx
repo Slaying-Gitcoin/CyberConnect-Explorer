@@ -35,7 +35,7 @@ function GetIdentityByPagination() {
   );
 }
 
-export function GraphqlTests() {
+export function GetIdentityTest() {
   return (
     <div>
       <GetIdentity />

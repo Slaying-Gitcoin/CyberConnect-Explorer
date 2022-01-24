@@ -1,4 +1,4 @@
-import { from, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { GET_RECOMMENDATIONS , RecommFilter } from "../graphql/get_recommendations_api"
 
 

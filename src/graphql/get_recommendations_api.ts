@@ -1,4 +1,4 @@
-import { gql, ApolloClient, InMemoryCache } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 
 export enum RecommFilter {
