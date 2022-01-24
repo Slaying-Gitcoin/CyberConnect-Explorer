@@ -11,6 +11,7 @@ interface Web3ContextInterface {
   disconnectWallet: () => void;
   address: string;
   ens: string | null;
+  provider: ethers.providers.Web3Provider | null;
 }
 
 export const Web3Context = createContext<Web3ContextInterface>({
@@ -18,6 +19,7 @@ export const Web3Context = createContext<Web3ContextInterface>({
   disconnectWallet: async () => undefined,
   address: '',
   ens: '',
+  provider: null,
 });
 
 const infuraId = undefined;
@@ -41,6 +43,7 @@ const providerOptions = {
 const Web3ContextProvider: React.FC = ({ children }) => {
   const [address, setAddress] = useState<string>('');
   const [ens, setEns] = useState<string | null>('');
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined);
 
   async function getEnsByAddress(
@@ -92,6 +95,7 @@ const Web3ContextProvider: React.FC = ({ children }) => {
 
       setAddress(address);
       setEns(ens);
+      setProvider(provider);
       subsribeProvider(provider);
     } catch (e) {
       disconnectWallet();
@@ -122,6 +126,7 @@ const Web3ContextProvider: React.FC = ({ children }) => {
         disconnectWallet,
         address,
         ens,
+        provider,
       }}
     >
       {children}
