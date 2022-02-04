@@ -1,4 +1,3 @@
-import getLabels from "../labels/get_labels";
 const axios = require("axios").default;
 
 function GetLabels() {

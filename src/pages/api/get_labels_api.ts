@@ -3,7 +3,10 @@ const pgp = require("pg-promise")({
   noWarnings: true,
 });
 
-const db = pgp(`postgres://babak:123456@localhost:5432/label`);
+const POSTGRES_PASS = process.env.POSTGRES_PASSWORD;
+const db = pgp(
+  `postgresql://postgres:${POSTGRES_PASS}@db.bzxetxyfhjyqpmzroook.supabase.co:5432/postgres`
+);
 
 export default async function getLabels(
   req: NextApiRequest,
