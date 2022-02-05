@@ -13,6 +13,10 @@ interface Web3ContextInterface {
   address: string;
   ens: string | null;
   cyberConnect: CyberConnect | null;
+  graphAddress: string;
+  setGraphAddress: (address: string) => void;
+  graphLoading: boolean,
+  setGraphLoading: (loading: boolean) => void;
 }
 
 export const Web3Context = createContext<Web3ContextInterface>({
@@ -21,6 +25,10 @@ export const Web3Context = createContext<Web3ContextInterface>({
   address: '',
   ens: '',
   cyberConnect: null,
+  graphAddress: '',
+  setGraphAddress: async () => undefined,
+  graphLoading: true,
+  setGraphLoading: async () => undefined,
 });
 
 const infuraId = 'ad1fb45e65ee4979954883a2e88aa4c3';
@@ -46,6 +54,8 @@ const Web3ContextProvider: React.FC = ({ children }) => {
   const [ens, setEns] = useState<string | null>('');
   const [cyberConnect, setCyberConnect] = useState<CyberConnect | null>(null);
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined);
+  const [graphAddress, setGraphAddress] = useState<string>('0x7c04786f04c522ca664bb8b6804e0d182eec505f');
+  const [graphLoading, setGraphLoading] = useState<boolean>(true);
 
   async function getEnsByAddress(
     provider: ethers.providers.Web3Provider,
@@ -140,6 +150,10 @@ const Web3ContextProvider: React.FC = ({ children }) => {
         address,
         ens,
         cyberConnect,
+        graphAddress,
+        setGraphAddress,
+        graphLoading,
+        setGraphLoading,
       }}
     >
       {children}

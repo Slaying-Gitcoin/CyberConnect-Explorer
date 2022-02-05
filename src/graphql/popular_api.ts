@@ -2,21 +2,21 @@ import { gql } from '@apollo/client';
 
 
 export enum TAG {
-    PLAZA,
-    FEATURED,
-    NFTMARKET
-    }
+  PLAZA,
+  FEATURED,
+  NFTMARKET
+}
 
 // export type TagsInput  = {
 //   list: TAG[]
 //   }
 
-  export class TagsInput{
-     list: TAG[];
-     constructor(list:TAG[]){
-       this.list = list
-     }
+export class TagsInput {
+  list: TAG[];
+  constructor(list: TAG[]) {
+    this.list = list
   }
+}
 
 //Please note that this API supports pagination
 export const POPULAR = gql`

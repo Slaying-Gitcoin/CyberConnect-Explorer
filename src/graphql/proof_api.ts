@@ -1,6 +1,5 @@
 import { gql } from '@apollo/client';
 
-
 export const PROOF = gql`
 query Proof(
             $fromAddress:String!,

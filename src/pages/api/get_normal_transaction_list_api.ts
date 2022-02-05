@@ -7,7 +7,7 @@ export default async function getNormalTransationList(
   res: NextApiResponse<any>
 ) {
   if (req.query["address"]) {
-    const URL = `/api?module=account&action=txlist&address=${req.query["address"]}&sort=asc&apikey=${process.env.ETHERSCAN_API_KEY}`;
+    const URL = `/api?module=account&action=txlist&address=${req.query["address"]}&page=1&offset=10000&sort=asc&apikey=${process.env.ETHERSCAN_API_KEY}`;
     const response = await axios.get(URL);
     res.status(200).json({ data: response.data });
   } else {
