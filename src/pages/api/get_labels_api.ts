@@ -12,7 +12,8 @@ export default async function getLabels(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  const query = "SELECT address, label from labels WHERE address= ANY($1)";
+  const query =
+    "SELECT address ,tag, entity from labels WHERE address= ANY($1)";
 
   const label = await db.query(query, [req.body.req]);
 
