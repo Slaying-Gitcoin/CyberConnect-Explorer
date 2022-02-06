@@ -1,6 +1,5 @@
 import { gql } from '@apollo/client';
 
-
 //Please note that this API supports pagination
 export const RANKINGS = gql`
 query Rankings(
