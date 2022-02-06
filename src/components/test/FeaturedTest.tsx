@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { FEATURED } from "../graphql/featured_api"
+import { FEATURED } from "../../graphql/featured_api"
 
 
 function Featured() {

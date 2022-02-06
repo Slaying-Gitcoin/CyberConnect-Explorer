@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { RANKINGS } from "../graphql/rankings_api"
+import { RANKINGS } from "../../graphql/rankings_api"
 
 
 function RankingsByPagination() {

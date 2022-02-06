@@ -17,6 +17,8 @@ interface Web3ContextInterface {
   setGraphAddress: (address: string) => void;
   graphLoading: boolean,
   setGraphLoading: (loading: boolean) => void;
+  getEnsByAddress: (address: string) => Promise<string | null>;
+  getAddressByEns: (ens: string) => Promise<string | null>;
 }
 
 export const Web3Context = createContext<Web3ContextInterface>({
@@ -29,6 +31,8 @@ export const Web3Context = createContext<Web3ContextInterface>({
   setGraphAddress: async () => undefined,
   graphLoading: true,
   setGraphLoading: async () => undefined,
+  getEnsByAddress: async () => null,
+  getAddressByEns: async () => null,
 });
 
 const infuraId = 'ad1fb45e65ee4979954883a2e88aa4c3';
@@ -53,16 +57,23 @@ const Web3ContextProvider: React.FC = ({ children }) => {
   const [address, setAddress] = useState<string>('');
   const [ens, setEns] = useState<string | null>('');
   const [cyberConnect, setCyberConnect] = useState<CyberConnect | null>(null);
+  const [provider, setProvider] = useState<ethers.providers.JsonRpcProvider | null>(null);
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined);
   const [graphAddress, setGraphAddress] = useState<string>('0x7c04786f04c522ca664bb8b6804e0d182eec505f');
   const [graphLoading, setGraphLoading] = useState<boolean>(true);
 
-  async function getEnsByAddress(
-    provider: ethers.providers.Web3Provider,
-    address: string
-  ) {
+  async function getEnsByAddress(address: string) {
+    if (!provider) return null
+
     const ens = await provider.lookupAddress(address);
     return ens;
+  }
+
+  async function getAddressByEns(ens: string) {
+    if (!provider) return null
+
+    const address = await provider.resolveName(ens);
+    return address;
   }
 
   const disconnectWallet = useCallback(async () => {
@@ -113,11 +124,12 @@ const Web3ContextProvider: React.FC = ({ children }) => {
       const provider = new ethers.providers.Web3Provider(instance);
       const signer = provider.getSigner();
       const address = await signer.getAddress();
-      const ens = await getEnsByAddress(provider, address);
+      const ens = await getEnsByAddress(address);
 
       setAddress(address);
       setEns(ens);
       subsribeProvider(provider);
+      setProvider(provider);
 
       initCyberConnect(provider.provider);
     } catch (e) {
@@ -154,6 +166,8 @@ const Web3ContextProvider: React.FC = ({ children }) => {
         setGraphAddress,
         graphLoading,
         setGraphLoading,
+        getEnsByAddress,
+        getAddressByEns,
       }}
     >
       {children}

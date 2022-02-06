@@ -28,7 +28,7 @@ export const SocialGraph = () => {
   return (
     <React.StrictMode>
       {w && h &&
-        <SigmaContainer style={{ width: w, height: h }}
+        <SigmaContainer style={{ width: w / 5 * 3, height: h }}
           initialSettings={settings}>
           <CustomGraph />
         </SigmaContainer>
