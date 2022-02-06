@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { FOLLOWING_ALIAS } from "../graphql/following_alias_api"
+import { FOLLOWING_ALIAS } from "../../graphql/following_alias_api"
 
 
 function FollowingAlias() {

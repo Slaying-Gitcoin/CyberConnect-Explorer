@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { FOLLOW_STATUS } from "../graphql/follow_status_api"
+import { FOLLOW_STATUS } from "../../graphql/follow_status_api"
 
 
 function FollowStatus() {

@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { PROOF } from "../graphql/proof_api"
+import { PROOF } from "../../graphql/proof_api"
 
 
 function Proof() {

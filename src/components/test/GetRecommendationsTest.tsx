@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { GET_RECOMMENDATIONS , RecommFilter } from "../graphql/get_recommendations_api"
+import { GET_RECOMMENDATIONS , RecommFilter } from "../../graphql/get_recommendations_api"
 
 
 function GetRecommendationsByPagination() {

@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { HOME_PAGE } from "../graphql/home_page_api"
+import { HOME_PAGE } from "../../graphql/home_page_api"
 
 
 function HomePage() {

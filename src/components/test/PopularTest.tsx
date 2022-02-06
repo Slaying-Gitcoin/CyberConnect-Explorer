@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { POPULAR , TagsInput, TAG } from "../graphql/popular_api"
+import { POPULAR , TagsInput, TAG } from "../../graphql/popular_api"
 
 
 function PopularByPagination() {

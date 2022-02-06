@@ -52,6 +52,7 @@ type TransactionSimple = {
   to: string,
   value: number,
   size: number,
+  label: string,
 }
 
 type SocialConnections = {
@@ -74,6 +75,10 @@ type SocialConnectionList = {
 }
 
 const emptyPic = '/empty-user-pic.png'
+
+async function GetLabels(req: string[]) {
+  return await axios.post("/api/get_labels_api", { req })
+}
 
 export const CustomGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
   const sigma = useSigma();
@@ -130,7 +135,7 @@ export const CustomGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
         if (existing) {
           existing.value = existing.value + +td.value;
         } else {
-          ts.push({ from: td.from, to: td.to, value: +td.value, size: 1 });
+          ts.push({ from: td.from, to: td.to, value: +td.value, size: 1, label: '' });
         }
         return ts;
       }, []);
@@ -140,7 +145,7 @@ export const CustomGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
         if (existing) {
           existing.value = existing.value + +td.value * -1;
         } else {
-          ts.push({ from: td.from, to: td.to, value: +td.value * -1, size: 1 });
+          ts.push({ from: td.from, to: td.to, value: +td.value * -1, size: 1, label: '' });
         }
         return ts;
       }, []);
@@ -197,7 +202,7 @@ export const CustomGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
       const { data } = await fetchMore({
         variables: { address: graphAddress, limit: 50, offset: offset },
         updateQuery: (prev: SocialConnections, { fetchMoreResult }) => {
-          if (prev.identity.followers === undefined) {
+          if (prev.identity === undefined || prev.identity.followers === undefined) {
             return fetchMoreResult
           }
           (fetchMoreResult as SocialConnections).identity.followers.list = prev.identity.followers.list.concat((fetchMoreResult as SocialConnections).identity.followers.list);
@@ -225,212 +230,172 @@ export const CustomGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
   }, [graphAddress]);
 
   useEffect(() => {
-    if (!transactionsLoaded || !followersLoaded || socialConnections === undefined || transactionData === undefined) return;
-    const graph = new Graph();
+    const generateGraph = async () => {
+      if (!transactionsLoaded || !followersLoaded || socialConnections === undefined || transactionData === undefined) return;
+      const graph = new Graph();
 
-    graph.addNode("USER", { label: identityData.ens, type: 'image', image: identityData.identity.avatar, size: 100, x: 0, y: 0 });
-    graph.addNode("FRIENDS", { label: "FRIENDS", type: 'image', image: '', size: 50, x: 1, y: 1 });
-    graph.addNode("FOLLOWERS", { label: "FOLLOWERS", type: 'image', image: '', size: 50, x: 1, y: -1 });
-    graph.addNode("FOLLOWING", { label: "FOLLOWING", type: 'image', image: '', size: 50, x: -1, y: 1 });
-    graph.addNode("TRANSACTIONS", { label: "TRANSACTIONS", type: 'image', image: '', size: 50, x: -1, y: -1 });
+      graph.addNode("USER", { label: identityData.identity ? identityData.identity.ens : '', type: 'image', image: identityData.identity.avatar ? identityData.identity.avatar : emptyPic, size: 80, x: 0, y: 0 });
 
-    graph.addEdge("USER", "FRIENDS", {});
-    graph.addEdge("USER", "FOLLOWERS", {});
-    graph.addEdge("USER", "FOLLOWING", {});
-    graph.addEdge("USER", "TRANSACTIONS", {});
-
-    const maxFriends = 50
-    let friendsSorted = [...socialConnections.identity.friends.list]
-    friendsSorted.sort((f1, f2) => {
-      const td1 = transactionData.find((t: TransactionSimple) => t.from == f1.address || t.to == f1.address)
-      const td2 = transactionData.find((t: TransactionSimple) => t.from == f2.address || t.to == f2.address)
-
-      if (td1 && td2) {
-        if (td1.value > td2.value) return -1
-        if (td1.value < td2.value) return 1
-      }
-      else if (td1) {
-        return -1;
-      }
-      else if (td2) {
-        return 1;
+      if (socialConnections.identity.friends.list.length != 0) {
+        graph.addNode("FRIENDS", { label: "FRIENDS", type: 'image', image: '', size: 40, x: 1, y: 1 });
+        graph.addEdge("USER", "FRIENDS", {});
       }
 
-      if (f1.avatar != '' && f2.avatar == '') {
-        return -1;
-      }
-      else if (f1.avatar == '' && f2.avatar != '') {
-        return 1;
+      if (socialConnections.identity.followers.list.length != 0) {
+        graph.addNode("FOLLOWERS", { label: "FOLLOWERS", type: 'image', image: '', size: 40, x: 1, y: -1 });
+        graph.addEdge("USER", "FOLLOWERS", {});
       }
 
-      if (f1.ens != '' && f2.ens == '') {
-        return -1;
-      }
-      else if (f1.ens == '' && f2.ens != '') {
-        return 1;
+      if (socialConnections.identity.followings.list.length != 0) {
+        graph.addNode("FOLLOWING", { label: "FOLLOWING", type: 'image', image: '', size: 40, x: -1, y: 1 });
+        graph.addEdge("USER", "FOLLOWING", {});
       }
 
-      return 0;
-    });
-    friendsSorted = friendsSorted.filter((item) => !graph.hasNode(item.address))
-    friendsSorted = friendsSorted.slice(0, maxFriends);
-
-    friendsSorted.forEach((friend: SocialConnection, i) => {
-      if (!graph.hasNode(friend.address)) {
-        const td = transactionData.find((t: TransactionSimple) => t.from == friend.address || t.to == friend.address)
-        const size = td ? td?.size + 10 : 15
-        const label = td ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : friend.ens
-        const image = friend.avatar != '' ? friend.avatar : (!td ? emptyPic : '')
-        const color = !td ? '' : (td?.value! > 0 ? '#00ff00' : '#ff0000')
-
-        graph.addNode(friend.address, { label: label, type: 'image', image: image, size: size, color: color });
-        graph.addEdge("FRIENDS", friend.address);
-
-        const angle = (i * 2 * Math.PI) / maxFriends;
-        graph.setNodeAttribute(friend.address, "x", 1 + .5 * Math.cos(angle));
-        graph.setNodeAttribute(friend.address, "y", 1 + .5 * Math.sin(angle));
-      }
-    });
-
-    const maxFollowing = 50
-    let followingsSorted = [...socialConnections.identity.followings.list]
-    followingsSorted.sort((f1, f2) => {
-      const td1 = transactionData.find((t: TransactionSimple) => t.from == f1.address || t.to == f1.address)
-      const td2 = transactionData.find((t: TransactionSimple) => t.from == f2.address || t.to == f2.address)
-
-      if (td1 && td2) {
-        if (td1.value > td2.value) return -1
-        if (td1.value < td2.value) return 1
-      }
-      else if (td1) {
-        return -1;
-      }
-      else if (td2) {
-        return 1;
+      if (transactionData.length != 0) {
+        graph.addNode("TRANSACTIONS", { label: "TRANSACTIONS", type: 'image', image: '', size: 40, x: -1, y: -1 });
+        graph.addEdge("USER", "TRANSACTIONS", {});
       }
 
-      if (f1.avatar != '' && f2.avatar == '') {
-        return -1;
-      }
-      else if (f1.avatar == '' && f2.avatar != '') {
-        return 1;
-      }
+      const sortAccordingToImportance = (u1: SocialConnection, u2: SocialConnection) => {
+        const td1 = transactionData.find((t: TransactionSimple) => t.from == u1.address || t.to == u1.address)
+        const td2 = transactionData.find((t: TransactionSimple) => t.from == u2.address || t.to == u2.address)
 
-      if (f1.ens != '' && f2.ens == '') {
-        return -1;
-      }
-      else if (f1.ens == '' && f2.ens != '') {
-        return 1;
-      }
+        if (td1 && td2) {
+          if (td1.value > td2.value) return -1
+          if (td1.value < td2.value) return 1
+        }
+        else if (td1) {
+          return -1;
+        }
+        else if (td2) {
+          return 1;
+        }
 
-      return 0;
-    });
+        if (u1.avatar != '' && u2.avatar == '') {
+          return -1;
+        }
+        else if (u1.avatar == '' && u2.avatar != '') {
+          return 1;
+        }
 
-    followingsSorted = followingsSorted.filter((item) => !graph.hasNode(item.address))
-    followingsSorted = followingsSorted.slice(0, maxFollowing);
+        if (u1.ens != '' && u2.ens == '') {
+          return -1;
+        }
+        else if (u1.ens == '' && u2.ens != '') {
+          return 1;
+        }
 
-    followingsSorted.forEach((followed: SocialConnection, i) => {
-      if (!graph.hasNode(followed.address)) {
-        const td = transactionData.find((t: TransactionSimple) => t.from == followed.address || t.to == followed.address)
-        const size = td ? td?.size + 10 : 15
-        const label = td ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : followed.ens
-        const image = followed.avatar != '' ? followed.avatar : (!td ? emptyPic : '')
-        const color = !td ? '' : (td?.value! > 0 ? '#00ff00' : '#ff0000')
-
-        graph.addNode(followed.address, { label: label, type: 'image', image: image, size: size, color: color });
-        graph.addEdge("FOLLOWING", followed.address);
-
-        const angle = (i * 2 * Math.PI) / maxFollowing;
-        graph.setNodeAttribute(followed.address, "x", -1 + .5 * Math.cos(angle));
-        graph.setNodeAttribute(followed.address, "y", 1 + .5 * Math.sin(angle));
-      }
-    });
-
-    const maxFollowers = 50
-    let followersSorted = [...socialConnections.identity.followers.list]
-    followersSorted.sort((f1, f2) => {
-      const td1 = transactionData.find((t: TransactionSimple) => t.from == f1.address || t.to == f1.address)
-      const td2 = transactionData.find((t: TransactionSimple) => t.from == f2.address || t.to == f2.address)
-
-      if (td1 && td2) {
-        if (td1.value > td2.value) return -1
-        if (td1.value < td2.value) return 1
-      }
-      else if (td1) {
-        return -1;
-      }
-      else if (td2) {
-        return 1;
+        return 0;
       }
 
-      if (f1.avatar != '' && f2.avatar == '') {
-        return -1;
+      const maxFriends = 50
+      let friendsSorted = [...socialConnections.identity.friends.list]
+      friendsSorted.sort(sortAccordingToImportance);
+      friendsSorted = friendsSorted.filter((item) => !graph.hasNode(item.address))
+      friendsSorted = friendsSorted.slice(0, maxFriends);
+
+      friendsSorted.forEach((friend: SocialConnection, i) => {
+        if (!graph.hasNode(friend.address)) {
+          const td = transactionData.find((t: TransactionSimple) => t.from == friend.address || t.to == friend.address)
+          const size = td ? td?.size + 10 : 15
+          const label = td ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : friend.ens
+          const image = friend.avatar != '' ? friend.avatar : (!td ? emptyPic : '')
+          const color = !td ? '' : (td?.value! > 0 ? '#00ff00' : '#ff0000')
+
+          graph.addNode(friend.address, { label: label, type: 'image', image: image, size: size, color: color });
+          graph.addEdge("FRIENDS", friend.address);
+
+          const angle = (i * 2 * Math.PI) / maxFriends;
+          graph.setNodeAttribute(friend.address, "x", 1 + .5 * Math.cos(angle));
+          graph.setNodeAttribute(friend.address, "y", 1 + .5 * Math.sin(angle));
+        }
+      });
+
+      const maxFollowing = 50
+      let followingsSorted = [...socialConnections.identity.followings.list]
+      followingsSorted.sort(sortAccordingToImportance);
+      followingsSorted = followingsSorted.filter((item) => !graph.hasNode(item.address))
+      followingsSorted = followingsSorted.slice(0, maxFollowing);
+
+      followingsSorted.forEach((followed: SocialConnection, i) => {
+        if (!graph.hasNode(followed.address)) {
+          const td = transactionData.find((t: TransactionSimple) => t.from == followed.address || t.to == followed.address)
+          const size = td ? td?.size + 10 : 15
+          const label = td ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : followed.ens
+          const image = followed.avatar != '' ? followed.avatar : (!td ? emptyPic : '')
+          const color = !td ? '' : (td?.value! > 0 ? '#00ff00' : '#ff0000')
+
+          graph.addNode(followed.address, { label: label, type: 'image', image: image, size: size, color: color });
+          graph.addEdge("FOLLOWING", followed.address);
+
+          const angle = (i * 2 * Math.PI) / maxFollowing;
+          graph.setNodeAttribute(followed.address, "x", -1 + .5 * Math.cos(angle));
+          graph.setNodeAttribute(followed.address, "y", 1 + .5 * Math.sin(angle));
+        }
+      });
+
+      const maxFollowers = 50
+      let followersSorted = [...socialConnections.identity.followers.list]
+      followersSorted.sort(sortAccordingToImportance);
+      followersSorted = followersSorted.filter((item) => !graph.hasNode(item.address))
+      followersSorted = followersSorted.slice(0, maxFollowers);
+
+      followersSorted.forEach((follower: SocialConnection, i) => {
+        if (!graph.hasNode(follower.address)) {
+          const td = transactionData.find((t: TransactionSimple) => t.from == follower.address || t.to == follower.address)
+          const size = td ? td?.size + 10 : 15
+          const label = td ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : follower.ens
+          const image = follower.avatar != '' ? follower.avatar : (!td ? emptyPic : '')
+          const color = !td ? '' : (td?.value! > 0 ? '#00ff00' : '#ff0000')
+
+          graph.addNode(follower.address, { label: label, type: 'image', image: image, size: size, color: color });
+          graph.addEdge("FOLLOWERS", follower.address);
+
+          const angle = (i * 2 * Math.PI) / maxFollowers;
+          graph.setNodeAttribute(follower.address, "x", 1 + .5 * Math.cos(angle));
+          graph.setNodeAttribute(follower.address, "y", -1 + .5 * Math.sin(angle));
+        }
+      });
+
+      const maxTransactions = 50
+      let transactionsSorted = [...transactionData]
+      transactionsSorted.sort((t1, t2) => Math.abs(t2.value) - Math.abs(t1.value));
+      transactionsSorted = transactionsSorted.slice(0, maxTransactions);
+
+      const labels = await GetLabels(transactionsSorted.map((t: TransactionSimple) => graphAddress == t.from ? t.to : t.from))
+      console.log(labels.data)
+      for (const l of labels.data) {
+        transactionsSorted.find((t: TransactionSimple) => t.from == l.address || t.to == l.address).label = l.label
       }
-      else if (f1.avatar == '' && f2.avatar != '') {
-        return 1;
-      }
 
-      if (f1.ens != '' && f2.ens == '') {
-        return -1;
-      }
-      else if (f1.ens == '' && f2.ens != '') {
-        return 1;
-      }
+      transactionsSorted.forEach((transaction: TransactionSimple, i) => {
+        const addr = transaction.to === graphAddress ? transaction.from : transaction.to;
+        if (!graph.hasNode(addr)) {
+          const td = transactionData.find((t: TransactionSimple) => t.from == addr || t.to == addr)
+          const size = td!.size
+          const label = transaction.label == '' ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : transaction.label
+          const color = td?.value! > 0 ? '#00ff00' : '#ff0000'
 
-      return 0;
-    });
+          graph.addNode(addr, { label: label, type: 'image', image: '', size: size, color: color });
+          graph.addEdge("TRANSACTIONS", addr);
 
-    followersSorted = followersSorted.filter((item) => !graph.hasNode(item.address))
-    followersSorted = followersSorted.slice(0, maxFollowers);
+          const angle = (i * 2 * Math.PI) / maxTransactions;
+          graph.setNodeAttribute(addr, "x", -1 + .5 * Math.cos(angle));
+          graph.setNodeAttribute(addr, "y", -1 + .5 * Math.sin(angle));
+        }
+      });
 
-    followersSorted.forEach((follower: SocialConnection, i) => {
-      if (!graph.hasNode(follower.address)) {
-        const td = transactionData.find((t: TransactionSimple) => t.from == follower.address || t.to == follower.address)
-        const size = td ? td?.size + 10 : 15
-        const label = td ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : follower.ens
-        const image = follower.avatar != '' ? follower.avatar : (!td ? emptyPic : '')
-        const color = !td ? '' : (td?.value! > 0 ? '#00ff00' : '#ff0000')
-
-        graph.addNode(follower.address, { label: label, type: 'image', image: image, size: size, color: color });
-        graph.addEdge("FOLLOWERS", follower.address);
-
-        const angle = (i * 2 * Math.PI) / maxFollowers;
-        graph.setNodeAttribute(follower.address, "x", 1 + .5 * Math.cos(angle));
-        graph.setNodeAttribute(follower.address, "y", -1 + .5 * Math.sin(angle));
-      }
-    });
-
-    const maxTransactions = 50
-    let transactionsSorted = [...transactionData]
-    transactionsSorted.sort((t1, t2) => Math.abs(t2.value) - Math.abs(t1.value));
-    transactionsSorted = transactionsSorted.slice(0, maxTransactions);
-
-    transactionsSorted.forEach((transaction: TransactionSimple, i) => {
-      const addr = transaction.to === graphAddress ? transaction.from : transaction.to;
-      if (!graph.hasNode(addr)) {
-        const td = transactionData.find((t: TransactionSimple) => t.from == addr || t.to == addr)
-        const size = td!.size
-        const label = td ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : ''
-        const color = td?.value! > 0 ? '#00ff00' : '#ff0000'
-
-        graph.addNode(addr, { label: label, type: 'image', image: '', size: size, color: color });
-        graph.addEdge("TRANSACTIONS", addr);
-
-        const angle = (i * 2 * Math.PI) / maxTransactions;
-        graph.setNodeAttribute(addr, "x", -1 + .5 * Math.cos(angle));
-        graph.setNodeAttribute(addr, "y", -1 + .5 * Math.sin(angle));
-      }
-    });
-
-    setGraph(graph);
-    setGraphLoading(false);
+      setGraph(graph);
+      setGraphLoading(false);
+    }
+    generateGraph()
   }, [graphAddress, transactionsLoaded, followersLoaded]);
 
   useEffect(() => {
     loadGraph(graph);
 
     //setInterval(() => {
-      animateNodes(sigma.getGraph(), forceAtlasPos2(), { duration: 0 });
+    animateNodes(sigma.getGraph(), forceAtlasPos2(), { duration: 0 });
     //}, 500);
 
     sigma.getCamera().animatedReset();
@@ -438,6 +403,7 @@ export const CustomGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
     // Register the events
     registerEvents({
       clickNode: (event) => {
+        setHoveredNode(null)
         sigma.clear();
         setGraph(new Graph());
         setSocialConnections(undefined);
@@ -490,7 +456,7 @@ export const CustomGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
           alignItems: 'center',
           justifyContent: 'center',
           height: height! - 1,
-          width: width! - 1
+          width: width! / 5 * 3 - 1
         }}>
           <ReactLoading type={'spin'} color={'#000000'} height={'50px'} width={'50px'} />
         </div>
