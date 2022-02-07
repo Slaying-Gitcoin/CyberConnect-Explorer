@@ -49,7 +49,6 @@ const GraphContextProvider: React.FC = ({ children }) => {
   useEffect(() => {
     const search = window.location.search;
     const address = new URLSearchParams(search).get("address");
-    console.log(address);
     if (address) {
       setGraphAddressInternal(address.toLowerCase());
     }
@@ -76,7 +75,7 @@ const GraphContextProvider: React.FC = ({ children }) => {
         },
       })
     let data = res.data.data.result;
-    console.log(data)
+
     data = data.filter((td: Transaction) => td.value != 0 && td.isError == false);
     let incoming = data.filter((td: Transaction) => td.to == graphAddress);
     let outgoing = data.filter((td: Transaction) => td.from == graphAddress);
@@ -126,7 +125,6 @@ const GraphContextProvider: React.FC = ({ children }) => {
     mergedAggregated.sort((a: TransactionSimple, b: TransactionSimple) => b.value - a.value);
 
     setTransactions(mergedAggregated);
-    console.log(mergedAggregated)
   };
 
   const { fetchMore } = useQuery(GET_CONNECTIONS_PAGINATED, {
@@ -163,7 +161,6 @@ const GraphContextProvider: React.FC = ({ children }) => {
       }
       if (!hasNextPage) {
         setSocialConnections(data)
-        console.log(data)
       }
     }
   }

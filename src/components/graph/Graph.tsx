@@ -1,12 +1,10 @@
 import React, { useContext } from "react";
 import "@visdauas/react-sigma-v2/lib/react-sigma-v2.css";
-import dynamic from "next/dynamic";
 import useWindowDimensions from "./useWindowDimensions";
 import { Settings } from "sigma/settings";
-const SigmaContainer = dynamic(import("@visdauas/react-sigma-v2").then(mod => mod.SigmaContainer), { ssr: false });
-const SocialGraph = dynamic(import("./SocialGraph").then(mod => mod.SocialGraph), { ssr: false });
 import getNodeImageProgram from "sigma/rendering/webgl/programs/node.image";
 import { GraphContext } from "../../context/GraphContext";
+import { SigmaContainer, SocialGraph } from "./imports";
 
 export const Graph = () => {
   const { width, height } = useWindowDimensions();

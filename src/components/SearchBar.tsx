@@ -15,7 +15,6 @@ export function SearchBar() {
       try {
         const ens = await getAddressByEns(newValue)
         if (ens) {
-          console.log(ens)
           setGraphAddress(ens)
         }
         else if (newValue.length == 42) {

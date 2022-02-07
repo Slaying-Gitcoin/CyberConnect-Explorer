@@ -188,9 +188,8 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
       transactionsSorted = transactionsSorted.slice(0, maxTransactions);
 
       const labels = await GetLabels(transactionsSorted.map((t: TransactionSimple) => graphAddress == t.from ? t.to : t.from))
-      console.log(labels.data)
       for (const l of labels.data) {
-        transactionsSorted.find((t: TransactionSimple) => t.from == l.address || t.to == l.address).label = l.tag == '' ? l.entity : l.tag
+        transactionsSorted.find((t: TransactionSimple) => t.from == l.address || t.to == l.address)!.label = l.tag == '' ? l.entity : l.tag
       }
 
       transactionsSorted.forEach((transaction: TransactionSimple, i) => {
@@ -198,7 +197,7 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
         if (!graph.hasNode(addr)) {
           const td = transactions.find((t: TransactionSimple) => t.from == addr || t.to == addr)
           const size = td!.size
-          const label = transaction.label == '' ? (Math.round(td.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : transaction.label
+          const label = transaction.label == '' ? (Math.round(td!.value / Math.pow(10, 18) * 1000) / 1000).toString() + " ETH" : transaction.label
           const color = td?.value! > 0 ? '#00ff00' : '#ff0000'
 
           graph.addNode(addr, { label: label, type: 'image', image: '', size: size, color: color });

@@ -17,7 +17,5 @@ export default async function getLabels(
 
   const label = await db.query(query, [req.body.req]);
 
-  console.log(label);
-
   res.status(200).json(label);
 }
