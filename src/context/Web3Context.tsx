@@ -13,10 +13,6 @@ interface Web3ContextInterface {
   address: string;
   ens: string | null;
   cyberConnect: CyberConnect | null;
-  graphAddress: string;
-  setGraphAddress: (address: string) => void;
-  graphLoading: boolean,
-  setGraphLoading: (loading: boolean) => void;
   getEnsByAddress: (address: string) => Promise<string | null>;
   getAddressByEns: (ens: string) => Promise<string | null>;
 }
@@ -27,10 +23,6 @@ export const Web3Context = createContext<Web3ContextInterface>({
   address: '',
   ens: '',
   cyberConnect: null,
-  graphAddress: '',
-  setGraphAddress: async () => undefined,
-  graphLoading: true,
-  setGraphLoading: async () => undefined,
   getEnsByAddress: async () => null,
   getAddressByEns: async () => null,
 });
@@ -162,10 +154,6 @@ const Web3ContextProvider: React.FC = ({ children }) => {
         address,
         ens,
         cyberConnect,
-        graphAddress,
-        setGraphAddress,
-        graphLoading,
-        setGraphLoading,
         getEnsByAddress,
         getAddressByEns,
       }}
