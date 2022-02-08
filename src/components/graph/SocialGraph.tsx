@@ -12,7 +12,7 @@ import useWindowDimensions from "./useWindowDimensions";
 import { GraphContext } from "../../context/GraphContext";
 import { TransactionSimple } from "../../types/TransactionSimple";
 import { SocialConnection } from "../../types/SocialConnection";
-import { Box, Flex, useDisclosure, FlexProps, Button, Stack, Text, Heading, Divider, Image } from "@chakra-ui/react"
+import { Heading } from "@chakra-ui/react"
 
 interface MyCustomGraphProps {
   children?: ReactNode;
@@ -26,7 +26,7 @@ async function GetLabels(req: string[]) {
 
 export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
   let sigma = useSigma();
-  const { graphAddress, graphLoading, hideGraph, setSelectedAddress, setGraphLoading, setHideGraph, identity, socialConnections, transactions } = useContext(GraphContext);
+  const { graphAddress, graphLoading, hideGraph, setGraphAddress, setSelectedAddress, setGraphLoading, setHideGraph, identity, socialConnections, transactions } = useContext(GraphContext);
   const { width, height } = useWindowDimensions();
   const registerEvents = useRegisterEvents();
   const loadGraph = useLoadGraph();
@@ -35,7 +35,7 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
   const [graph, setGraph] = useState<Graph>(new Graph());
 
   const forceAtlasPos2 = useLayoutForceAtlas2({
-    iterations: 300,
+    iterations: 200,
     settings: {
       gravity: 1,
       adjustSizes: true,
@@ -238,6 +238,11 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
         setHoveredNode(null)
         if (event.node.startsWith('0x')) {
           setSelectedAddress(event.node);
+        }
+      },
+      doubleClickNode: (event) => {
+        if (event.node.startsWith('0x')) {
+          setGraphAddress(event.node);
         }
       },
       enterNode: (event: { node: any; }) => setHoveredNode(event.node),
