@@ -2,9 +2,9 @@ import React, { useContext } from "react";
 import "@visdauas/react-sigma-v2/lib/react-sigma-v2.css";
 import useWindowDimensions from "./useWindowDimensions";
 import { Settings } from "sigma/settings";
-import getNodeImageProgram from "sigma/rendering/webgl/programs/node.image";
 import { GraphContext } from "../../context/GraphContext";
 import { SigmaContainer, SocialGraph } from "./imports";
+import getNodeImageProgram from "./webgl/image.node";
 
 export const Graph = () => {
   const { width, height } = useWindowDimensions();
