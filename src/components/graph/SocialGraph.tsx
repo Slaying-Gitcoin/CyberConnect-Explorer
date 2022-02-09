@@ -18,7 +18,7 @@ interface MyCustomGraphProps {
   children?: ReactNode;
 }
 
-const emptyPic = '/empty-user-pic.png'
+const emptyPic = '/no-avatar.png'
 
 async function GetLabels(req: string[]) {
   return await axios.post("/api/get_labels_api", { req })
@@ -62,22 +62,22 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
       graph.addNode(graphAddress, { label: identity ? identity.ens : '', type: 'image', image: identity.avatar ? identity.avatar : emptyPic, size: 80, x: 0, y: 0 });
 
       if (socialConnections.identity.friends.list.length != 0) {
-        graph.addNode("FRIENDS", { label: "FRIENDS", type: 'image', image: '', size: 40, x: 1, y: 1 });
+        graph.addNode("FRIENDS", { label: "FRIENDS", type: 'image', image: '', color: '#2364ff', size: 40, x: 1, y: 1 });
         graph.addEdge(graphAddress, "FRIENDS", {});
       }
 
       if (socialConnections.identity.followers.list.length != 0) {
-        graph.addNode("FOLLOWERS", { label: "FOLLOWERS", type: 'image', image: '', size: 40, x: 1, y: -1 });
+        graph.addNode("FOLLOWERS", { label: "FOLLOWERS", type: 'image', image: '', color: '#2364ff', size: 40, x: 1, y: -1 });
         graph.addEdge(graphAddress, "FOLLOWERS", {});
       }
 
       if (socialConnections.identity.followings.list.length != 0) {
-        graph.addNode("FOLLOWING", { label: "FOLLOWING", type: 'image', image: '', size: 40, x: -1, y: 1 });
+        graph.addNode("FOLLOWING", { label: "FOLLOWING", type: 'image', image: '', color: '#2364ff', size: 40, x: -1, y: 1 });
         graph.addEdge(graphAddress, "FOLLOWING", {});
       }
 
       if (transactions.length != 0) {
-        graph.addNode("TRANSACTIONS", { label: "TRANSACTIONS", type: 'image', image: '', size: 40, x: -1, y: -1 });
+        graph.addNode("TRANSACTIONS", { label: "TRANSACTIONS", type: 'image', image: '', color: '#2364ff', size: 40, x: -1, y: -1 });
         graph.addEdge(graphAddress, "TRANSACTIONS", {});
       }
 
@@ -257,13 +257,24 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
         const newData: Attributes = { ...data, highlighted: data.highlighted || false };
 
         if (hoveredNode) {
-          if (node === hoveredNode) {
+          if (node === hoveredNode ||
+            graph.outNeighbors(node).includes(hoveredNode.toString()) ||
+            graph.inNeighbors(node).includes(hoveredNode.toString())) {
+
             newData.highlighted = true;
-            newData.label = node;
+            if (newData.label == '') {
+              newData.label = node
+            }
+            sigma.setSetting('labelWeight', 'bold');
           } else {
             newData.color = "#E2E2E2";
+            newData.image = ''
+            newData.label = ''
             newData.highlighted = false;
           }
+        }
+        else {
+          sigma.setSetting('labelWeight', 'normal');
         }
         return newData;
       },
@@ -287,7 +298,7 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
           alignItems: 'center',
           justifyContent: 'center',
           height: height! - 1,
-          width: width! / 5 * 3 - 1
+          width: width! - 1
         }}>
           <ReactLoading type={'spin'} color={'#000000'} height={'50px'} width={'50px'} />
         </div>
@@ -298,7 +309,7 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
           alignItems: 'center',
           justifyContent: 'center',
           height: height! - 1,
-          width: width! / 5 * 3 - 1,
+          width: width! - 1,
         }}>
           <Heading size={'xl'}>User not found</Heading>
         </div>
