@@ -27,6 +27,9 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
+## How did we manage mapping between addresses and labels
+We created a remote Posgresql database for getting labels for a specific address. This project uses [this repository]() repository for creating database.It's obtained by page scraping & API-querying etherscan's team scanners. For each address it has some subset of [name tag, labels, ownership entity]. It page scraped each labelcloud (i.e. etherscan.io/labelcloud) for all labels, and then got all the addresses for each labels with their name tags.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
