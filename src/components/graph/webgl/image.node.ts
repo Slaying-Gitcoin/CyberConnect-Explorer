@@ -251,7 +251,6 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
             const gl = this.gl;
 
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            console.log(textureImage);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
             gl.generateMipmap(gl.TEXTURE_2D);
 

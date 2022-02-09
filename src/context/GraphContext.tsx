@@ -49,13 +49,15 @@ const GraphContextProvider: React.FC = ({ children }) => {
   useEffect(() => {
     const search = window.location.search;
     const address = new URLSearchParams(search).get("address");
-    if (address) {
+    if (address && address.length == 42) {
       setGraphAddressInternal(address.toLowerCase());
+      setSelectedAddress(address.toLowerCase());
     }
     else
     {
       // default address: cyberlab.eth
       setGraphAddressInternal('0x148d59faf10b52063071eddf4aaf63a395f2d41c');
+      setSelectedAddress('0x148d59faf10b52063071eddf4aaf63a395f2d41c');
     }
   }, []);
 

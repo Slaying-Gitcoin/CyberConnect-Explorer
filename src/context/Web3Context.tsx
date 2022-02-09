@@ -51,20 +51,16 @@ const Web3ContextProvider: React.FC = ({ children }) => {
   const [cyberConnect, setCyberConnect] = useState<CyberConnect | null>(null);
   const [provider, setProvider] = useState<ethers.providers.JsonRpcProvider | null>(null);
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined);
-  const [graphAddress, setGraphAddress] = useState<string>('0x7c04786f04c522ca664bb8b6804e0d182eec505f');
-  const [graphLoading, setGraphLoading] = useState<boolean>(true);
 
   async function getEnsByAddress(address: string) {
     if (!provider) return null
 
-    const ens = await provider.lookupAddress(address);
+    const ens = await ethers.providers.getDefaultProvider().lookupAddress(address);
     return ens;
   }
 
   async function getAddressByEns(ens: string) {
-    if (!provider) return null
-
-    const address = await provider.resolveName(ens);
+    const address = await ethers.providers.getDefaultProvider().resolveName(ens);
     return address;
   }
 

@@ -24,17 +24,14 @@ export function MainPage({ children }: { children: ReactNode }) {
           </Box>
         </Flex>
       </Box>
-      <Flex direction={'row'}>
-        <Box flex={1}>
-          <UserPanel address={graphAddress} />
-        </Box>
-        <Box flex={3}>
+      <Box>
+        <Box position={'fixed'}>
           {children}
         </Box>
-        <Box flex={1}>
-          <UserPanel address={selectedAddress}  />
+        <Box display={'block'} position={'fixed'}>
+          <UserPanel address={selectedAddress} />
         </Box>
-      </Flex>
+      </Box>
     </Box>
   )
 }

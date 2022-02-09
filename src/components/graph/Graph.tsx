@@ -18,6 +18,7 @@ export const Graph = () => {
       image: getNodeImageProgram()
     }
   };
+
   if(graphLoading || hideGraph) {
     w = 1;
     h = 1;
@@ -26,7 +27,7 @@ export const Graph = () => {
   return (
     <React.StrictMode>
       {w && h &&
-        <SigmaContainer style={{ width: w / 5 * 3, height: h }}
+        <SigmaContainer style={{ width: w , height: h }}
           initialSettings={settings}>
           <SocialGraph />
         </SigmaContainer>
