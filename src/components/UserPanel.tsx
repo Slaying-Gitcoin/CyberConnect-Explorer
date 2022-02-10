@@ -24,7 +24,6 @@ export function UserPanel({ address }: { address: string }) {
     useContext(GraphContext);
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
-  const [sentBalanceReq , setSentBalanceReq] = useState(false);
 
   const identityData = useQuery(GET_IDENTITY, {
     variables: {
@@ -38,33 +37,33 @@ export function UserPanel({ address }: { address: string }) {
     }
   }, [identityData]);
 
-  if (address === "") return null;
+  useEffect(() => {
+    if (address === '') return;
 
-  if(!sentBalanceReq) {
-    setSentBalanceReq(true);
+    const GetBalance = async () => {
+      await axios
+        .get("/api/get_balance_api", {
+          params: {
+            address: address,
+          },
+        }).then(function (response: any) {
+          const balanceData = response.data.data.result;
+          const niceData = ethers.utils.formatEther(balanceData);
+          setBalance(parseFloat(niceData).toFixed(4));
+        })
+        .catch(function (error: { response: any }) {
+          // handle error
+          console.log(error.response);
+        });
+    }
 
-    axios
-    .get("/api/get_balance_api", {
-      params: {
-        address: address,
-      },
-    })
-    .then(function (response: any) {
-      const balanceData = response.data.data.result;
-      const niceData = ethers.utils.formatEther(balanceData);
-      setBalance(parseFloat(niceData).toFixed(4));
-    })
-    .catch(function (error: { response: any }) {
-      // handle error
-      console.log(error.response);
-    });
-  }
+    GetBalance();
+  }, [address]);
 
   const ClosePanel = () => {
-    setSelectedAddress("");
     setIdentity(null);
     setBalance(null);
-    setSentBalanceReq(false);
+    setSelectedAddress("");
   };
 
   if (!identity) return null;
