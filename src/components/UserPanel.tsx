@@ -24,6 +24,7 @@ export function UserPanel({ address }: { address: string }) {
     useContext(GraphContext);
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
+  const [sentBalanceReq , setSentBalanceReq] = useState(false);
 
   const identityData = useQuery(GET_IDENTITY, {
     variables: {
@@ -37,9 +38,11 @@ export function UserPanel({ address }: { address: string }) {
     }
   }, [identityData]);
 
-  if (address === "") return null
+  if (address === "") return null;
 
-  if(balance === null) {
+  if(!sentBalanceReq) {
+    setSentBalanceReq(true);
+
     axios
     .get("/api/get_balance_api", {
       params: {
@@ -61,6 +64,7 @@ export function UserPanel({ address }: { address: string }) {
     setSelectedAddress("");
     setIdentity(null);
     setBalance(null);
+    setSentBalanceReq(false);
   };
 
   if (!identity) return null;
