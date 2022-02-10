@@ -50,7 +50,7 @@ A user's importance is determined according to this model(higher in the list = m
 - React Sigma v2 [(Custom fork)](https://github.com/Slaying-Gitcoin/react-sigma-v2)
 
 ## How did we manage mapping between addresses and labels
-We created a remote Posgresql database for getting labels for a specific address. This project uses [this repository]() for creating the database. It's obtained by page scraping & API-querying etherscan's labelcloud. For each address it has some subset of [name tag, labels, ownership entity]. It page scraped each labelcloud (i.e. etherscan.io/labelcloud) for all labels, and then got all the addresses for each labels with their name tags.
+We created a remote Posgresql database for getting labels for a specific address. This project uses [this repository](https://github.com/Slaying-Gitcoin/blockchain-address-database) for creating the database. It's obtained by page scraping & API-querying etherscan's labelcloud. For each address it has some subset of [name tag, labels, ownership entity]. It page scraped each labelcloud (i.e. etherscan.io/labelcloud) for all labels, and then got all the addresses for each labels with their name tags.
 
 ## How to get running
 
