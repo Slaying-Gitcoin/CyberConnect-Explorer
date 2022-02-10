@@ -3,9 +3,8 @@ const pgp = require("pg-promise")({
   noWarnings: true,
 });
 
-const POSTGRES_PASS = process.env.POSTGRES_PASSWORD;
 const db = pgp(
-  `postgresql://postgres:${POSTGRES_PASS}@db.bzxetxyfhjyqpmzroook.supabase.co:5432/postgres`
+  `postgresql://postgres:${process.env.LABELS_POSTGRES_PASSWORD}@${process.env.LABELS_POSTGRES_ENDPOINT}`
 );
 
 export default async function getLabels(

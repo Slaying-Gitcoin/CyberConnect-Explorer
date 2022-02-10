@@ -102,8 +102,8 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-        canvas.width = pendingImages.reduce((iter, { size }) => iter +  Math.max(Math.min(MAX_TEXTURE_SIZE, size), 1), hasReceivedImages ? textureImage.width : 0);
-        canvas.height = Math.max(hasReceivedImages ? textureImage.height : 0, ...pendingImages.map(({ size }) => Math.max(Math.min(MAX_TEXTURE_SIZE, size), 1)));
+        canvas.width = pendingImages.reduce((iter, { size }) => iter + Math.min(MAX_TEXTURE_SIZE, size), hasReceivedImages ? textureImage.width : 0);
+        canvas.height = Math.max(hasReceivedImages ? textureImage.height : 0, ...pendingImages.map(({ size }) => Math.min(MAX_TEXTURE_SIZE, size)));
 
         let xOffset = 0;
         if (hasReceivedImages) {
@@ -111,7 +111,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
             xOffset = textureImage.width;
         }
         pendingImages.forEach(({ id, image, size }) => {
-            const imageSizeInTexture = Math.max(Math.min(MAX_TEXTURE_SIZE, size), 1);
+            const imageSizeInTexture = Math.min(MAX_TEXTURE_SIZE, size);
 
             // Crop image, to only keep the biggest square, centered:
             let dx = 0,

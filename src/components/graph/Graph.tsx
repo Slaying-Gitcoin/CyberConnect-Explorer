@@ -19,7 +19,7 @@ export const Graph = () => {
     }
   };
 
-  if(graphLoading || hideGraph) {
+  if (graphLoading || hideGraph) {
     w = 1;
     h = 1;
   }
@@ -27,7 +27,7 @@ export const Graph = () => {
   return (
     <React.StrictMode>
       {w && h &&
-        <SigmaContainer style={{ width: w , height: h }}
+        <SigmaContainer style={{ width: w, height: h }}
           initialSettings={settings}>
           <SocialGraph />
         </SigmaContainer>

@@ -1,10 +1,9 @@
-import React, { ReactNode, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Graph from "graphology";
 import NodeKey, { Attributes } from "graphology-types";
 import {
   useSigma, useRegisterEvents, useLoadGraph, useSetSettings, useLayoutForceAtlas2
 } from "@visdauas/react-sigma-v2";
-import "@visdauas/react-sigma-v2/lib/react-sigma-v2.css";
 import axios from "axios";
 import { animateNodes } from "sigma/utils/animate";
 import ReactLoading from 'react-loading';
@@ -14,17 +13,13 @@ import { TransactionSimple } from "../../types/TransactionSimple";
 import { SocialConnection } from "../../types/SocialConnection";
 import { Heading } from "@chakra-ui/react"
 
-interface MyCustomGraphProps {
-  children?: ReactNode;
-}
-
 const emptyPic = '/no-avatar.png'
 
 async function GetLabels(req: string[]) {
   return await axios.post("/api/get_labels_api", { req })
 }
 
-export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
+export const SocialGraph = () => {
   let sigma = useSigma();
   const { graphAddress, graphLoading, hideGraph, setGraphAddress, setSelectedAddress, setGraphLoading, setHideGraph, identity, socialConnections, transactions } = useContext(GraphContext);
   const { width, height } = useWindowDimensions();
@@ -46,13 +41,6 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
       outboundAttractionDistribution: false,
     }
   }).positions;
-
-  useEffect(() => {
-    setHoveredNode(null)
-    //sigma.clear()
-    loadGraph(new Graph());
-    setGraph(new Graph());
-  }, [graphAddress]);
 
   useEffect(() => {
     const generateGraph = async () => {
@@ -226,9 +214,8 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
   useEffect(() => {
 
     loadGraph(graph);
-    //setInterval(() => {
-    animateNodes(sigma.getGraph(), forceAtlasPos2(), { duration: 0 });
-    //}, 500);
+
+    animateNodes(sigma.getGraph(), forceAtlasPos2(), { duration: 3000 });
 
     sigma.getCamera().animatedReset();
 
@@ -314,7 +301,6 @@ export const SocialGraph: React.FC<MyCustomGraphProps> = ({ children }) => {
           <Heading size={'xl'}>User not found</Heading>
         </div>
       }
-      {children}
     </>
   );
 };

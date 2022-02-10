@@ -1,5 +1,5 @@
 import { ReactNode, useContext } from "react";
-import { Box, Flex, useDisclosure, FlexProps, Button, Stack, Text, Divider, Center } from "@chakra-ui/react"
+import { Box, Flex, Text, Divider, Center } from "@chakra-ui/react"
 import { UserPanel } from "./UserPanel";
 import { SearchBar } from "./SearchBar";
 import { GraphContext } from "../context/GraphContext";

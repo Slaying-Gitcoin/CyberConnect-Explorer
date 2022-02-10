@@ -1,15 +1,10 @@
 import { gql } from '@apollo/client';
 
-
 export enum TAG {
   PLAZA,
   FEATURED,
   NFTMARKET
 }
-
-// export type TagsInput  = {
-//   list: TAG[]
-//   }
 
 export class TagsInput {
   list: TAG[];
@@ -44,6 +39,4 @@ query Popular(
                           }
                         }
                     }
-                  
-
 `;

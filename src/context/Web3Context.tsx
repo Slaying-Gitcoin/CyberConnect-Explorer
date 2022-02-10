@@ -53,8 +53,6 @@ const Web3ContextProvider: React.FC = ({ children }) => {
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined);
 
   async function getEnsByAddress(address: string) {
-    if (!provider) return null
-
     const ens = await ethers.providers.getDefaultProvider().lookupAddress(address);
     return ens;
   }
@@ -138,7 +136,8 @@ const Web3ContextProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (web3Modal != null && web3Modal.cachedProvider) {
-      connectWallet();
+      // this is disabled for now because its not being used
+      //connectWallet();
     }
   }, [web3Modal]);
 

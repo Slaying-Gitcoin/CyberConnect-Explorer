@@ -1,13 +1,13 @@
-import React, { useState, useEffect, createContext, useCallback } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import { useQuery } from '@apollo/client';
 import axios from 'axios';
 import { GET_CONNECTIONS_PAGINATED } from '../graphql/get_connections_api';
 import { GET_IDENTITY } from '../graphql/get_identity_api';
-import { AllSocialConnections, SocialConnectionsPaginated } from '../types/SocialConnectionsPaginated';
+import { AllSocialConnections } from '../types/SocialConnectionsPaginated';
 import { TransactionSimple } from '../types/TransactionSimple';
 import { Identity } from '../types/Identity';
 import { Transaction } from '../types/Transaction';
-import { useRouter } from 'next/router';
+import { DEFAULT_GRAPH_ADDRESS } from '../defaults';
 
 interface GraphContextInterface {
   graphAddress: string;
@@ -55,9 +55,8 @@ const GraphContextProvider: React.FC = ({ children }) => {
     }
     else
     {
-      // default address: cyberlab.eth
-      setGraphAddressInternal('0x148d59faf10b52063071eddf4aaf63a395f2d41c');
-      setSelectedAddress('0x148d59faf10b52063071eddf4aaf63a395f2d41c');
+      setGraphAddressInternal(DEFAULT_GRAPH_ADDRESS);
+      setSelectedAddress(DEFAULT_GRAPH_ADDRESS);
     }
   }, []);
 
@@ -158,9 +157,13 @@ const GraphContextProvider: React.FC = ({ children }) => {
 
       hasNextPage = identity.followers.pageInfo.hasNextPage || identity.followings.pageInfo.hasNextPage || identity.friends.pageInfo.hasNextPage
       offset = Math.max(+identity.followers.pageInfo.endCursor, +identity.followings.pageInfo.endCursor, +identity.friends.pageInfo.endCursor).toString()
-      if (identity.followers.list.length >= 500) {
+
+      // display only the first 500 social connections, because it takes too much time to query more
+      // TODO: make querying asynchronous or somehow fix this
+      if (Math.max(identity.followers.list.length, identity.followings.list.length, identity.friends.list.length) >= 500) {
         hasNextPage = false
       }
+
       if (!hasNextPage) {
         setSocialConnections(data)
       }

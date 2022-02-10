@@ -1,9 +1,10 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { CYBERCONNECT_ENDPOINT } from '../defaults';
 
 const cache = new InMemoryCache();
 
 const client = new ApolloClient({
-  uri: 'https://api.cybertino.io/connect/',
+  uri: CYBERCONNECT_ENDPOINT,
   cache: cache
 });
 

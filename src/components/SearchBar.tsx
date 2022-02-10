@@ -1,11 +1,11 @@
-import { Box, Flex, useDisclosure, FlexProps, Button, Stack, Text, Input } from "@chakra-ui/react"
-import { SetStateAction, useContext, useState } from "react"
+import { Input } from "@chakra-ui/react"
+import { useContext, useState } from "react"
 import { GraphContext } from "../context/GraphContext";
 import { Web3Context } from "../context/Web3Context";
 
 export function SearchBar() {
   const { getAddressByEns } = useContext(Web3Context);
-  const { graphAddress, setGraphAddress } = useContext(GraphContext);
+  const { setGraphAddress } = useContext(GraphContext);
 
   const [value, setValue] = useState('')
   const handleChange = async (event: { target: { value: string } }) => {
@@ -21,7 +21,7 @@ export function SearchBar() {
           setGraphAddress(newValue)
         }
 
-      } catch (error) {}
+      } catch (error) { }
     }
   }
 
