@@ -1,37 +1,71 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# CyberConnect Explorer
 
-## Getting Started
+[Explore](cyberconnect-explorer.vercel.app) CyberConnect's decentralized social graph protocol!
+Built for Schelling Point virtual [Gitcoin hackathon](https://gitcoin.co/issue/cyberconnecthq/explorer-and-cyberconnected-dapps/1/100027517) 
 
-First, run the development server:
+[![image32e65ee6c8723c56.png](https://s10.gifyu.com/images/image32e65ee6c8723c56.png)](https://gifyu.com/image/Szqrn)
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Search by address or ENS
+- WebGL rendered social graph with +200 nodes
+- Nodes are scaled according to importance
+- Etherscan labelcloud labels on transactions
+- Side panel with the selected user's socials and ether balance displayed
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## How we calculate node importance
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Since some users have thousands of followers and transactions we need to sort those connections according to their importance
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### Graph display priorities
 
-## Learn More
+We display a user's node in this order, this means that if you send money to bob and he is your friend than his node will be displayed at the friends section with the aggregated transaction value:
+- Friend
+- Following
+- Follower
+- Transactions
 
-To learn more about Next.js, take a look at the following resources:
+### Transactions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+We query the selected user's last 10000 transactions and aggregate(if bob sent you 1 eth and you sent him back 20 ETH than that equals -19 ETH aggregated transaction to bob) transactions that were from/to the same address. Then we select the 50 largest ones to display. The more realtive aggregated value the bigger the node.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### CyberConnect Users
+
+A user's importance is determined according to this model(higher in the list = more important):
+- Aggregated transaction volume
+- Profile picture
+- ENS domain
+
+## Tech Stack
+
+- NodeJS 16
+- React
+- Next.js
+- Sigma.js
+- Etherscan api
+- CyberConnect api
+- Postgres
+- Vercel
+- Graphology [(Custom fork)](https://github.com/Slaying-Gitcoin/graphology)
+- React Sigma v2 [(Custom fork)](https://github.com/Slaying-Gitcoin/react-sigma-v2)
 
 ## How did we manage mapping between addresses and labels
-We created a remote Posgresql database for getting labels for a specific address. This project uses [this repository]() repository for creating database.It's obtained by page scraping & API-querying etherscan's team scanners. For each address it has some subset of [name tag, labels, ownership entity]. It page scraped each labelcloud (i.e. etherscan.io/labelcloud) for all labels, and then got all the addresses for each labels with their name tags.
+We created a remote Posgresql database for getting labels for a specific address. This project uses [this repository](https://github.com/Slaying-Gitcoin/blockchain-address-database) for creating the database. It's obtained by page scraping & API-querying etherscan's labelcloud. For each address it has some subset of [name tag, labels, ownership entity]. It page scraped each labelcloud (i.e. etherscan.io/labelcloud) for all labels, and then got all the addresses for each labels with their name tags.
 
-## Deploy on Vercel
+## How to get running
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Make sure to get an Etherscan api key and set it in the .env file.
+2. Build & deploy the labelcloud database
+3. Install dependencies and start the web server :D
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```
+yarn; yarn dev
+```
+
+## Disclaimer
+
+- This is just a prototype and shouldn't be used in a production environment
+- Currently the mobile experience sucks, you can't click on nodes and the graph is very laggy. This can be improved with some time but requires modifying Sigma.js
+- Under heavy traffic this site will break because we are using a free Etherscan api key and that limits the amount of requests the webserver can send
+
+
