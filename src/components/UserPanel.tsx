@@ -25,23 +25,6 @@ export function UserPanel({ address }: { address: string }) {
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
 
-  axios
-    .get("/api/get_balance_api", {
-      params: {
-        address: address,
-      },
-    })
-    .then(function (response: any) {
-      console.log(response.data.data.result);
-      const balanceData = response.data.data.result;
-      const niceData = ethers.utils.formatEther(balanceData);
-      setBalance(parseFloat(niceData).toFixed(4));
-    })
-    .catch(function (error: { response: any }) {
-      // handle error
-      console.log(error.response);
-    });
-
   const identityData = useQuery(GET_IDENTITY, {
     variables: {
       address: address,
@@ -53,6 +36,24 @@ export function UserPanel({ address }: { address: string }) {
       setIdentity(identityData.identity);
     }
   }, [identityData]);
+
+  if (address === "") return null
+
+  axios
+    .get("/api/get_balance_api", {
+      params: {
+        address: address,
+      },
+    })
+    .then(function (response: any) {
+      const balanceData = response.data.data.result;
+      const niceData = ethers.utils.formatEther(balanceData);
+      setBalance(parseFloat(niceData).toFixed(4));
+    })
+    .catch(function (error: { response: any }) {
+      // handle error
+      console.log(error.response);
+    });
 
   const ClosePanel = () => {
     setSelectedAddress("");
