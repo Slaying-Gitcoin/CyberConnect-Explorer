@@ -39,7 +39,8 @@ export function UserPanel({ address }: { address: string }) {
 
   if (address === "") return null
 
-  axios
+  if(balance === null) {
+    axios
     .get("/api/get_balance_api", {
       params: {
         address: address,
@@ -54,10 +55,12 @@ export function UserPanel({ address }: { address: string }) {
       // handle error
       console.log(error.response);
     });
+  }
 
   const ClosePanel = () => {
     setSelectedAddress("");
     setIdentity(null);
+    setBalance(null);
   };
 
   if (!identity) return null;
