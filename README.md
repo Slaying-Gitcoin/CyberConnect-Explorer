@@ -3,7 +3,8 @@
 [Explore](cyberconnect-explorer.vercel.app) CyberConnect's decentralized social graph protocol!
 Built for Schelling Point virtual [Gitcoin hackathon](https://gitcoin.co/issue/cyberconnecthq/explorer-and-cyberconnected-dapps/1/100027517) 
 
-[![image32e65ee6c8723c56.png](https://s10.gifyu.com/images/image32e65ee6c8723c56.png)](https://gifyu.com/image/Szqrn)
+[![cyberlab](https://s10.gifyu.com/images/image0b51f6a34d170380.png)](https://gifyu.com/image/Szqto)
+[![wearehiring](https://s10.gifyu.com/images/image32e65ee6c8723c56.png)](https://gifyu.com/image/Szqrn)
 
 ## Features
 
